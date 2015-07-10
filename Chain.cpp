@@ -14,10 +14,12 @@ Chain::Chain(int pin)
 void Chain::increment()
 {
   _timePosition = ++_timePosition % period;
-  if(_enabled){
+  if(_enabled)
+  {
     short lastVal = currentVal;
     
-    switch(waveShape){
+    switch(waveShape)
+    {
       case CONSTANT:
         currentVal = brightness;
         break;
@@ -30,17 +32,20 @@ void Chain::increment()
       default:
         currentVal = 0;
     }
-    if(currentVal != lastVal){
+    if(currentVal != lastVal)
+    {
       analogWrite(_pin, min(currentVal, MAX_BRIGHTNESS));
     }
   }
 }
 
-void Chain::enable(){
+void Chain::enable()
+{
   _enabled = true;
 }
 
-void Chain::disable(){
+void Chain::disable()
+{
   _enabled = false;
   analogWrite(_pin, 0);
 }
