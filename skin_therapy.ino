@@ -6,16 +6,22 @@ Chain green(5);
 void setup(){
   Serial.begin(9600);
   
-  yellow.enabled = true;
   yellow.period = 1000;
   yellow.brightness = 128;
+  yellow.enable();
   
-  green.enabled = true;
-  green.period = 500;
+  green.period = 100;
+  green.waveShape = SINE_WAVE;
+  green.enable();
 }
 
 void loop(){
+  
+// if(Serial.available()){
+//   long val = Serial.parseInt(); //TODO read bytes directly
+// }
+  
   yellow.increment();
   green.increment();
-  delay(1);
+  delayMicroseconds(10);
 }

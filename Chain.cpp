@@ -5,31 +5,42 @@ Chain::Chain(int pin)
 {
   pinMode(pin, OUTPUT);
   _pin = pin;
-  
   brightness = MAX_BRIGHTNESS;
-  enabled = false;
-  period = 0;
-  
-  analogWrite(_pin, 0);
+  period = 1*10000; //1 second
+  waveShape = CONSTANT;
+  disable();
 }
 
 void Chain::increment()
 {
   _timePosition = ++_timePosition % period;
-  if(enabled){
-
-    analogWrite(_pin, min(currentValue(), MAX_BRIGHTNESS));
+  if(_enabled){
+    short lastVal = currentVal;
+    
+    switch(waveShape){
+      case CONSTANT:
+        currentVal = brightness;
+        break;
+      case TRIANGLE_WAVE:
+        currentVal = round(brightness*(abs((period/2)-_timePosition)/(float)(period/2)));
+        break;
+      case SINE_WAVE:
+        currentVal = round(brightness*(0.5+sin(2.0*3.1416*_timePosition/(float)period)/2));
+        break;
+      default:
+        currentVal = 0;
+    }
+    if(currentVal != lastVal){
+      analogWrite(_pin, min(currentVal, MAX_BRIGHTNESS));
+    }
   }
 }
 
-short Chain::currentValue(){
-    short currentVal = brightness;
-    if(period>0){
-      currentVal = round(brightness*(abs((period/2)-_timePosition)/(float)(period/2)));
-    }
-    return currentVal;
+void Chain::enable(){
+  _enabled = true;
 }
 
-float Chain::test(){
-  return round(brightness*(abs((period/2)-_timePosition)/(float)(period/2)));
+void Chain::disable(){
+  _enabled = false;
+  analogWrite(_pin, 0);
 }
