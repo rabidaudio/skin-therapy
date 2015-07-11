@@ -28,7 +28,7 @@ public class ChainPacket {
 
     private static final int PACKET_SIZE = 8;
 
-    public static final byte MAX_BRIGHTNESS = (byte) 0xFF;
+    public static final int MAX_BRIGHTNESS = 255;
 
     private int brightness = MAX_BRIGHTNESS;
     private int period = 10000; //1 second in 100us units
@@ -43,12 +43,12 @@ public class ChainPacket {
         ByteBuffer b = ByteBuffer.allocate(PACKET_SIZE);
         byte whichChains = 0;
         for(Chain c : chains){
-            whichChains |= c.index;
+            whichChains |= (1<<c.index);
         }
         b.put(whichChains);
         b.put((byte)(enabled ? 1 : 0));
-        b.put((byte) (brightness & 0xFF));
-        b.putShort((short) (period & 0xFFFF));
+        b.put((byte) brightness);
+        b.putShort((short) period);
         b.put(waveShape.id);
 
         return b.array().clone();
@@ -56,7 +56,7 @@ public class ChainPacket {
 
     public ChainPacket setBrightness(int brightness) {
         if(brightness<0 || brightness>MAX_BRIGHTNESS)
-            throw new IllegalArgumentException("brightness must be between 0 and MAX_BRIGHTNESS: "+brightness);
+            throw new IllegalArgumentException("brightness must be between 0 and "+MAX_BRIGHTNESS+": "+brightness);
         this.brightness = brightness;
         return this;
     }
@@ -68,11 +68,6 @@ public class ChainPacket {
 
     public ChainPacket setWaveShape(Shape waveShape) {
         this.waveShape = waveShape;
-        return this;
-    }
-
-    public ChainPacket enable() {
-        this.enabled = true;
         return this;
     }
 
