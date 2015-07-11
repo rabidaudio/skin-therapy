@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Chain.h"
+#include "FastSine.h"
 
 Chain::Chain(int pin)
 {
@@ -28,7 +29,10 @@ void Chain::increment()
 
         break;
       case SINE_WAVE:
-        currentVal = round(brightness*(0.5+sin(2.0*3.1416*_timePosition/(float)period)/2));
+//        currentVal = brightness*(0.5+sin(TWO_PI*_timePosition/(float)period)/2);
+//          currentVal = map(255*sin(TWO_PI*_timePosition/(float)period),-255,255,0,brightness);//actually worse
+//          currentVal = brightness*(0.5+isin(TWO_PI*_timePosition/(float)period)/2);
+          currentVal = brightness*(0.5+isin(180*_timePosition/(float)period)/2);
         break;
       case CONSTANT:
       default:

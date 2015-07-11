@@ -11,9 +11,9 @@ void setup()
 {
   Serial.begin(9600);
   
-//  yellow.period = 1000;
+  yellow.period = 100;
 //  yellow.brightness = 128;
-  yellow.waveShape = SINE_WAVE;
+  yellow.waveShape = TRIANGLE_WAVE;
   yellow.enable();
 //  
 //  green.period = 100;
@@ -30,7 +30,12 @@ void loop()
 {
    long t = micros(); 
   //every 100 cycles, check for data
-  if(++cycles == 100)
+  if(++cycles==200){
+    while(true){
+      ;
+    }
+  }
+  if(false && ++cycles == 100) //TODO
   {
     cycles = 0;
     
@@ -75,7 +80,10 @@ void loop()
 
   //execution time depends significantly on the waveShape and the number of chains
   // for more accuracy, we can add an external timer, but it shouldn't be neccessary
-//  delayMicroseconds(1000-(micros()-t));
-  Serial.println(micros()-t);
-  delay(100);
+  delayMicroseconds(1000-(micros()-t));
+//  Serial.println(micros()-t);
+  Serial.print(green.currentVal);
+  Serial.print("\t");
+  Serial.println(yellow.currentVal);
+  delay(10);
 }
