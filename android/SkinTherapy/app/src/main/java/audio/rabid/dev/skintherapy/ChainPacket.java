@@ -1,11 +1,18 @@
 package audio.rabid.dev.skintherapy;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by Charles on 7/10/2015.
+ *
+ * Defines protocol
+ *
+ * TODO add support for requesting the state of a particular packet
  */
 public class ChainPacket {
+
+//    public static final byte SET_CID = 0x1;
 
     public enum Chain {
         YELLOW(0),
@@ -41,6 +48,7 @@ public class ChainPacket {
 
     public byte[] applyTo(Chain... chains){
         ByteBuffer b = ByteBuffer.allocate(PACKET_SIZE);
+        b.order(ByteOrder.LITTLE_ENDIAN);
         byte whichChains = 0;
         for(Chain c : chains){
             whichChains |= (1<<c.index);

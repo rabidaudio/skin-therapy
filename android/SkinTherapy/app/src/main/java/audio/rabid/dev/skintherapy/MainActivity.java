@@ -1,5 +1,7 @@
 package audio.rabid.dev.skintherapy;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -10,6 +12,7 @@ import android.app.FragmentTransaction;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +23,7 @@ import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -51,6 +55,28 @@ public class MainActivity extends Activity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        print(new ChainPacket()
+                .setBrightness(32)
+                .setPeriod(500)
+                .setWaveShape(ChainPacket.Shape.TRIANGLE_WAVE)
+                .applyTo(ChainPacket.Chain.GREEN));
+
+        print(ChainPacket.disableAll());
+
+        ByteBuffer b = ByteBuffer.allocate(6);
+        b.order(ByteOrder.LITTLE_ENDIAN);
+        b.put((byte)0x61);
+        b.put((byte)0x62);
+        b.put((byte)0x63);
+        b.putShort((short)0x6465);
+        b.put((byte)0x66);
+        print(b.array().clone());
+    }
+
+    private void print(byte[] bytes){
+        String s = Utils.bytesToHex(bytes);
+        Log.d(TAG, "asHex: "+s);
+        Log.d(TAG, "asLong: "+Long.parseLong(s, 16));
     }
 
 
