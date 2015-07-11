@@ -13,28 +13,30 @@ Chain::Chain(int pin)
 
 void Chain::increment()
 {
-  _timePosition = ++_timePosition % period;
+  _timePosition = ++_timePosition % (2*period);
   if(_enabled)
   {
-    short lastVal = currentVal;
+     int lastVal = currentVal;
     
     switch(waveShape)
     {
-      case CONSTANT:
-        currentVal = brightness;
-        break;
       case TRIANGLE_WAVE:
-        currentVal = round(brightness*(abs((period/2)-_timePosition)/(float)(period/2)));
+        currentVal = (_timePosition < period
+            ? map(_timePosition, 0, period, 0, brightness)//brightness*(_timePosition/(float)period)
+            : map(2*period - _timePosition, 0, period, 0, brightness)//brightness*((2*period - _timePosition)/(float)period)
+            );
+
         break;
       case SINE_WAVE:
         currentVal = round(brightness*(0.5+sin(2.0*3.1416*_timePosition/(float)period)/2));
         break;
+      case CONSTANT:
       default:
-        currentVal = 0;
+        currentVal = brightness;
     }
     if(currentVal != lastVal)
     {
-      analogWrite(_pin, min(currentVal, MAX_BRIGHTNESS));
+      analogWrite(_pin, currentVal);
     }
   }
 }

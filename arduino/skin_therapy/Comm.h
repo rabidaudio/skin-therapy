@@ -7,6 +7,8 @@
 #ifndef Comm_h
 #define Comm_h
 
+#define PACKET_LEN 8
+
 union Incoming
 {
   struct
@@ -17,7 +19,7 @@ union Incoming
     unsigned short period;
     byte waveShape;
   } packet;
-  unsigned long raw;
+  char rawBytes[PACKET_LEN-1];
 };
 
 #endif

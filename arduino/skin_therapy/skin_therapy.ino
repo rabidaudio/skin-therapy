@@ -11,39 +11,71 @@ void setup()
 {
   Serial.begin(9600);
   
-  yellow.period = 1000;
-  yellow.brightness = 128;
+//  yellow.period = 1000;
+//  yellow.brightness = 128;
+  yellow.waveShape = SINE_WAVE;
   yellow.enable();
-  
-  green.period = 100;
+//  
+//  green.period = 100;
   green.waveShape = SINE_WAVE;
+  green.period = 100;
   green.enable();
-  
+
 
 }
 
+int cycles = 0;
+
 void loop()
 {
-  
-  if(Serial.available())
+   long t = micros(); 
+  //every 100 cycles, check for data
+  if(++cycles == 100)
   {
-    Incoming i; 
-    i.raw = Serial.parseInt(); //TODO read directly
-    for(int x=0; x<NUM_CHAINS; x++)
+    cycles = 0;
+    
+    if(Serial.available()>=PACKET_LEN)
     {
-      if(bitRead(i.packet.whichChains, x))
+      Incoming i; 
+      Serial.readBytes(i.rawBytes, PACKET_LEN);
+  
+      Serial.print("rawBytes:");
+      Serial.println(i.rawBytes);
+      Serial.print("whichChains:");
+      Serial.println(i.packet.whichChains);
+      for(int x=0; x<NUM_CHAINS; x++)
       {
-        (*chains[x]).brightness = i.packet.brightness;
-        (*chains[x]).period = i.packet.period;
-        (*chains[x]).waveShape = i.packet.waveShape;
-        (i.packet.enable ? (*chains[x]).enable() : (*chains[x]).disable());
+        if(bitRead(i.packet.whichChains, x))
+        {
+          Serial.print("==for ");
+          Serial.println(x);
+          Serial.println( (i.packet.enable ? "enabled" : "disabled"));
+          Serial.print("brightness: ");
+          Serial.println(i.packet.brightness);
+          Serial.print("period: ");
+          Serial.println(i.packet.period);
+          Serial.print("wave shape: ");
+          Serial.println(i.packet.waveShape);
+          
+          Chain c = (*chains[x]);
+          c.brightness = i.packet.brightness;
+          c.period = i.packet.period;
+          c.waveShape = i.packet.waveShape;
+          (i.packet.enable ? c.enable() : c.disable());
+        }
       }
+      delay(100);
     }
   }
 
   for(int x=0; x<NUM_CHAINS; x++)
   {
     (*chains[x]).increment();
-  }  
-  delayMicroseconds(10);
+  }
+
+  //execution time depends significantly on the waveShape and the number of chains
+  // for more accuracy, we can add an external timer, but it shouldn't be neccessary
+//  delayMicroseconds(1000-(micros()-t));
+  Serial.println(micros()-t);
+  delay(100);
 }

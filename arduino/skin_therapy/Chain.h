@@ -23,10 +23,10 @@ class Chain
 {
   public:
     Chain(int pin);
-    short brightness;
-    long period;
-    int waveShape;
-    short currentVal;
+    byte brightness;
+    unsigned short period;
+    byte waveShape;
+    int currentVal;
     
     void increment();
     void enable();
