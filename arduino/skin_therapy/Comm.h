@@ -9,17 +9,66 @@
 
 #define PACKET_LEN 8
 
-union Incoming
+#define SET_PACKET 0x57
+#define READ_PACKET 0x52
+
+#define STATE_PACKET 0x53
+#define ERROR_PACKET 0x45
+
+typedef struct
 {
-  struct
+    union
+    {
+        byte CID;
+        char bytes[PACKET_LEN];
+    };
+} Packet;
+
+typedef struct
+{
+  union
   {
-    byte whichChains;
-    byte enable;
-    byte brightness;
-    unsigned short period;
-    byte waveShape;
-  } packet;
-  char rawBytes[PACKET_LEN];
-};
+    Packet raw;
+    struct __attribute__((packed)) {
+      byte CID;
+      byte whichChains;
+      byte enable;
+      byte brightness;
+      unsigned short period;
+      byte waveShape;
+      //byte _reserved;
+    };
+  };
+} SetPacket;
+
+typedef struct
+{
+  union
+  {
+    Packet raw;
+    struct __attribute__((packed)) {
+      byte CID;
+      byte chainIndex;
+      //byte _reserved[6];
+    };
+  };
+} ReadPacket;
+
+typedef struct
+{
+  union
+  {
+    Packet raw;
+    struct __attribute__((packed)) {
+      byte CID;
+      byte chainIndex;
+      byte enabled;
+      byte brightness;
+      unsigned short period;
+      byte waveShape;
+      //byte _reserved;
+    };
+  };
+} StatePacket;
 
 #endif

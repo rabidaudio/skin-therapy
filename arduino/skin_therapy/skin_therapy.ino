@@ -1,10 +1,8 @@
 #include "Chain.h"
 #include "Comm.h"
 
-#define DEBUG 1
-
-Chain yellow(4);
-Chain green(5);
+Chain yellow(4, 0);
+Chain green(5, 1);
 
 Chain* chains[] = { &yellow, &green };
 const int NUM_CHAINS = 2;
@@ -28,51 +26,14 @@ int cycles = 0;
 
 void loop()
 {
-   long t = micros(); 
-  //every 100 cycles, check for data
-  if(++cycles == 100) //TODO
+  long t = micros(); 
+  
+  if(++cycles == 100) //every 100 cycles, check for data
   {
     cycles = 0;
-    
-    if(Serial.available()>=PACKET_LEN)
+    if(Serial.available() >= PACKET_LEN)
     {
-      Incoming i; 
-      Serial.readBytes(i.rawBytes, PACKET_LEN);
-      
-      if(DEBUG)
-      {
-        Serial.println(sizeof(i.packet));
-        Serial.println(sizeof(i.rawBytes));
-        Serial.print("rawBytes:");
-        Serial.println(i.rawBytes);
-        Serial.print("whichChains:");
-        Serial.println(i.packet.whichChains);
-      }
-      for(int x=0; x<NUM_CHAINS; x++)
-      {
-        if(bitRead(i.packet.whichChains, x))
-        {
-          if(DEBUG)
-          {
-            Serial.print("==for ");
-            Serial.println(x);
-            Serial.println( (i.packet.enable ? "enabled" : "disabled"));
-            Serial.print("brightness: ");
-            Serial.println(i.packet.brightness);
-            Serial.print("period: ");
-            Serial.println(i.packet.period);
-            Serial.print("wave shape: ");
-            Serial.println(i.packet.waveShape);
-          }
-          
-          Chain c = (*chains[x]);
-          c.brightness = i.packet.brightness;
-          c.period = i.packet.period;
-          c.waveShape = i.packet.waveShape;
-          (i.packet.enable ? c.enable() : c.disable());
-        }
-      }
-      delay(100);
+      handlePacket();
     }
   }
 
@@ -84,4 +45,49 @@ void loop()
   //execution time depends significantly on the waveShape and the number of chains
   // for more accuracy, we can add an external timer, but it shouldn't be neccessary
   delayMicroseconds(1000-(micros()-t));
+}
+
+
+void handlePacket()
+{
+  Packet p;
+  Serial.readBytes(p.bytes, PACKET_LEN);
+  switch(p.CID)
+  {
+    case SET_PACKET: //write the parameters to the chains
+      SetPacket i;
+      i.raw = p;
+      
+      for(int x=0; x<NUM_CHAINS; x++)
+      {
+        if(bitRead(i.whichChains, x))
+        {
+          Chain c = (*chains[x]);
+          c.brightness = i.brightness;
+          c.period = i.period;
+          c.waveShape = i.waveShape;
+          (i.enable ? c.enable() : c.disable());
+        }
+      }
+      break;
+    case READ_PACKET: //respond back with the chain's state
+      ReadPacket r;
+      r.raw = p;
+      if(r.chainIndex < 0 || r.chainIndex > NUM_CHAINS){
+        sendError();
+      }else{
+        StatePacket state = (*chains[r.chainIndex]).getState();
+        Serial.write(state.raw.bytes);
+      }
+      break;
+    default:
+      sendError(); //unknown packet
+  }
+  delay(100);
+}
+void sendError()
+{
+  Packet error;
+  error.CID = ERROR_PACKET;
+  Serial.write(error.bytes);
 }

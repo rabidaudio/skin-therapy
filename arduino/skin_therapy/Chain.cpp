@@ -2,10 +2,11 @@
 #include "Chain.h"
 #include "FastSine.h"
 
-Chain::Chain(int pin)
+Chain::Chain(int pin, int id)
 {
   pinMode(pin, OUTPUT);
   _pin = pin;
+  _id = id;
   brightness = MAX_BRIGHTNESS;
   period = 1000; //1 second
   waveShape = CONSTANT;
@@ -52,4 +53,16 @@ void Chain::disable()
 {
   _enabled = false;
   analogWrite(_pin, 0);
+}
+
+StatePacket Chain::getState()
+{
+  StatePacket state;
+  state.CID = STATE_PACKET;
+  state.chainIndex = _id;
+  state.enabled = _enabled;
+  state.brightness = brightness;
+  state.period = period;
+  state.waveShape = waveShape;
+  return state;
 }

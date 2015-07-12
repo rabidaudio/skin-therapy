@@ -13,16 +13,18 @@
 #define Chain_h
 
 #define MAX_BRIGHTNESS 255
+
 #define CONSTANT      0x1
 #define TRIANGLE_WAVE 0x2
 #define SINE_WAVE     0x4
 
 #include "Arduino.h"
+#include "Comm.h"
 
 class Chain
 {
   public:
-    Chain(int pin);
+    Chain(int pin, int id);
     byte brightness;
     unsigned short period;
     byte waveShape;
@@ -31,9 +33,11 @@ class Chain
     void increment();
     void enable();
     void disable();
+    StatePacket getState();
   private:
-    int _timePosition;
     int _pin;
+    int _id;
+    int _timePosition;
     boolean _enabled;
 };
 
