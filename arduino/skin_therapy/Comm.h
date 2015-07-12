@@ -19,7 +19,7 @@ union Incoming
     unsigned short period;
     byte waveShape;
   } packet;
-  char rawBytes[PACKET_LEN-1];
+  char rawBytes[PACKET_LEN];
 };
 
 #endif
