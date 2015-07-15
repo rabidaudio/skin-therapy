@@ -7,6 +7,6 @@ public class ReadPacket extends Packet.Outgoing {
 
     public ReadPacket(ChainPacket.Chain whichChain){
         super(READ_PACKET, DEFAULT_LENGTH);
-        bytes.put((byte) whichChain.index);
+        bytes.put(whichChain.index);
     }
 }

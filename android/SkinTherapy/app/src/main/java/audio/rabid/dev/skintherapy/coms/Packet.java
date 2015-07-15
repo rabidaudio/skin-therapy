@@ -42,6 +42,7 @@ public abstract class Packet {
             super(cid, length);
             bytes = ByteBuffer.allocate(length);
             bytes.order(ByteOrder.LITTLE_ENDIAN);
+            bytes.put(cid);
         }
 
         private boolean used = false;

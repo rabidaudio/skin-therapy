@@ -10,7 +10,7 @@ public class ChainPacket extends Packet.Outgoing {
     public enum Chain {
         YELLOW(0),
         GREEN(1);
-        byte index;
+        public byte index;
         Chain(int index){
             this.index = (byte) index;
         }
