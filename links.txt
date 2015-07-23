@@ -1,0 +1,6 @@
+http://mcuoneclipse.com/2013/06/19/using-the-hc-06-bluetooth-module/
+
+http://www.lairdtech.com/product-categories/embedded-wireless/bluetooth-modules/bluetooth-v40-ble/bl6x0-series-ble-radio
+
+http://stackoverflow.com/questions/17794469/is-serial-port-profile-spp-supported-on-ios-7-over-bluetooth-low-energy-v4-0
+

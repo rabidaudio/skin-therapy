@@ -9,11 +9,11 @@
 
 #define PACKET_LEN 8
 
-#define SET_PACKET 0x57
-#define READ_PACKET 0x52
+#define SET_PACKET 0x57  //W for write
+#define READ_PACKET 0x52 //R for read
 
-#define STATE_PACKET 0x53
-#define ERROR_PACKET 0x45
+#define STATE_PACKET 0x53 //S for state
+#define ERROR_PACKET 0x45 //E for error
 
 typedef struct
 {
